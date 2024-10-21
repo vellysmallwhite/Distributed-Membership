@@ -1,0 +1,41 @@
+How to Run the Test Cases:
+For Best Experience: Run Each Test Case Individually To ensure the best experience 
+and to focus on each test case without interference, it's recommended to run each 
+test case individually.
+
+Run Test Case 1:
+
+make testcase1
+
+Run Test Case 2:
+
+
+make testcase2
+
+Run Test Case 3:
+
+make testcase3
+
+Run Test Case 4:
+
+make testcase4
+
+Other Commands Options:
+
+Build the Docker Image: If you just want to rebuild the Docker image without running any tests, use:
+
+make buil
+
+Stop and Clean Up Docker Containers: If you want to stop and remove all the containers from previous runs before starting a new test, use:
+
+make down
+
+
+Docker Build Command: If you want to manually build the Docker image outside of the Makefile, you can use the following command:
+
+
+docker build . -t prj3
+
+docker compose -f docker-compose-testcase-1.yml up
+Note:
+For each test case, ensure that the containers are properly stopped and removed before running a new test to avoid conflicts. This is handled automatically by the down target in the Makefile.

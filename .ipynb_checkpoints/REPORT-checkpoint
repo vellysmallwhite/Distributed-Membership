@@ -1,0 +1,53 @@
+1. Introduction
+This report describes the system architecture, design decisions, and implementation details of a distributed membership protocol. The primary function of the system is to allow peers in a distributed system to communicate, join and leave the system, elect leaders, and detect failures, all while maintaining an up-to-date membership list.
+
+The system is implemented in C++ using TCP and UDP sockets for communication and multithreading for concurrent operations. Key design components include peer-to-peer message passing, leader election, heartbeat-based failure detection, and message serialization.
+
+2. System Architecture
+The system is composed of several peers running in a distributed network, each maintaining its own local membership list. The communication between peers is based on TCP for message exchanges and UDP for heartbeats, which are used to detect failures.
+
+Key components of the architecture include:
+
+Peer: Each instance represents a peer in the network and includes mechanisms for communicating, joining, and leaving the system.
+Leader: The system uses a leader-based architecture. The leader is responsible for managing membership updates (e.g., adding or removing peers) and handling special cases like peer failures.
+Membership Management: The membership list is stored locally by each peer and synchronized through leader broadcasts. Each peer keeps track of the active processes in the system.
+3. State Diagrams
+Peer State Diagram:
+
+Join: A peer attempts to join the system by discovering the current leader and sending a JOIN request.
+Message Handling: After joining, the peer listens for messages from other peers or the leader.
+Failure Detection: Each peer monitors the heartbeats of other peers to detect failures.
+Leader Election: If the leader fails, a new leader is elected from the membership list.
+Leader State Diagram:
+
+Membership Updates: The leader handles JOIN and REQ (request) messages to modify the membership list.
+Broadcasting Updates: After processing membership updates, the leader broadcasts the updated list to all peers.
+Failure Handling: The leader detects failed peers and removes them from the membership list, broadcasting the changes to others.
+4. Design Decisions
+Peer-to-Peer Communication: Each peer maintains both incoming and outgoing TCP connections to every other peer. The system was designed to allow peers to send and receive messages concurrently, making it fully decentralized.
+
+Leader-Based Membership Management: To simplify the protocol, a single leader manages all membership changes. The leader receives JOIN requests and broadcasts the new membership list. If the leader fails, a new leader is elected from the remaining active peers.
+
+Failure Detection Using Heartbeats: Each peer sends UDP heartbeats periodically to signal its activity. If a peer does not receive a heartbeat within a specific timeout, it is marked as failed and removed from the membership list.
+
+Message Serialization: All messages between peers are serialized before being sent over the network. This ensures that complex structures (e.g., membership lists) can be transmitted reliably and parsed by the receiving peer.
+
+5. Implementation Issues
+Concurrent Connections: Managing concurrent TCP connections for both incoming and outgoing messages was challenging. Each peer maintains separate threads for sending and receiving messages, which required careful synchronization to avoid race conditions.
+
+Handling Crashes: The system includes functionality to simulate peer crashes, allowing for testing how the system responds to unexpected failures. The challenge was ensuring that the leader could properly detect crashes and broadcast updates to the remaining peers.
+
+Leader Election: Implementing the leader election mechanism was non-trivial due to the need for synchronization between peers. The leader is chosen deterministically (e.g., the peer with the lowest ID), and all peers must agree on the new leader after a failure.
+
+Message Ordering: Ensuring that messages are processed in the correct order, particularly in the presence of failures and concurrent messages, required additional logic in the message handling functions.
+
+6. Conclusion
+This distributed membership protocol effectively allows peers to join and leave the network dynamically while maintaining a consistent view of the membership list. By leveraging leader-based coordination, UDP-based failure detection, and concurrent TCP communication, the system ensures robust and fault-tolerant operation.
+
+The primary challenges faced during development were managing concurrent connections, implementing failure detection, and handling leader election in a fault-tolerant manner.
+
+
+
+
+
+
